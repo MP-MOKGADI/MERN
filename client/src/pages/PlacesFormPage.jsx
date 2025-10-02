@@ -38,6 +38,7 @@ export default function PlacesFormPage() {
         setCheckInTime(data.checkInTime);
         setCheckOutTime(data.checkOutTime);
         setMaxGuests(data.maxGuests);
+        setPrice(data.price);
       })
     }, [id]);
 

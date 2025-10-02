@@ -12,6 +12,8 @@ const multer = require('multer');
 const Place = require('./models/place');
 const fs = require('fs');
 const path = require('path');
+const Booking = require('./models/Booking');
+const { ok } = require('assert');
 require('dotenv').config();
 
 const app = express();
@@ -182,22 +184,41 @@ app.post("/places", async (req, res) => {
   });
 });
 //----------------------- get places-----------------------
-app.get('/places',(req,res) => {
-   const { token } = req.cookies;
-   if (!token) return res.status(401).json({ error: "Not authenticated" });
+// app.get('/places',(req,res) => {
+//    const { token } = req.cookies;
+//    if (!token) return res.status(401).json({ error: "Not authenticated" });
 
-   jwt.verify(token, jwtSecret, {}, async (err, decoded) => {
-     if (err) return res.status(401).json({ error: "Invalid token" });
+//    jwt.verify(token, jwtSecret, {}, async (err, decoded) => {
+//      if (err) return res.status(401).json({ error: "Invalid token" });
 
-     try {
-       const places = await Place.find({ owner: decoded.id });
-       res.json(places);
-     } catch (err) {
-       console.error("❌ Error fetching places:", err);
-       res.status(500).json({ error: "Failed to fetch places" });
-     }
-   });
+//      try {
+//        const places = await Place.find({ owner: decoded.id });
+//        res.json(places);
+//      } catch (err) {
+//        console.error("❌ Error fetching places:", err);
+//        res.status(500).json({ error: "Failed to fetch places" });
+//      }
+//    });
+// });
+
+// GET /user-places — only for logged-in user
+app.get('/user-places', (req, res) => {
+  const { token } = req.cookies;
+  if (!token) return res.status(401).json({ error: "Not authenticated" });
+
+  jwt.verify(token, jwtSecret, {}, async (err, decoded) => {
+    if (err) return res.status(401).json({ error: "Invalid token" });
+
+    try {
+      const places = await Place.find({ owner: decoded.id });
+      res.json(places);
+    } catch (err) {
+      console.error("❌ Failed to fetch user places:", err);
+      res.status(500).json({ error: "Failed to fetch user places" });
+    }
+  });
 });
+
 //----------------------- get place by id-----------------------
 app.get('/places/:id',async (req,res) => {
     const { id } = req.params;
@@ -209,7 +230,7 @@ app.put('/places/:id', async (req, res) => {
   const { id } = req.params;
   const { token } = req.cookies;
 
-  // destructure correctly
+  
   const { 
     title,
     address,
@@ -265,3 +286,182 @@ app.put('/places/:id', async (req, res) => {
 app.get('/places',async (req,res) => {
     res.json(await Place.find());
 });
+//----------------------- booking-----------------------
+// app.post('/bookings', async (req, res) => {
+//   try {
+//     const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
+
+//     const booking = await Booking.create({
+//       place,
+//       checkInDate: checkIn,    // map to schema field
+//       checkOutDate: checkOut,  // map to schema field
+//       numberOfGuests,
+//       fullName: name,          // map to schema field
+//       phone,
+//       price,
+//     });
+
+//     res.json(booking);
+//   } catch (err) {
+//     console.error("Booking error:", err);
+//     res.status(500).json({ error: "Failed to create booking" });
+//   }
+// });
+
+function getUserDataFromReq(req) {
+  return new Promise((resolve, reject) => {
+    const token = req.cookies?.token; // pull token from cookies
+    if (!token) {
+      return reject(new Error("No token provided"));
+    }
+
+    jwt.verify(token, jwtSecret, {}, (err, userData) => {
+      if (err) {
+        return reject(err); // handle error gracefully
+      }
+      resolve(userData); // decoded JWT payload
+    });
+  });
+}
+
+
+
+
+
+// app.get('/api/bookings', async (req,res) => {
+//   mongoose.connect(process.env.MONGO_URL);
+//   const userData = await getUserDataFromReq(req);
+//   res.json( await Booking.find({user:userData.id}).populate('place') );
+// });
+
+// function getUserDataFromReq(req){
+//   return new Promise ((resolve,reject) =>{
+//      jwt.verify(req.cookies,jwtSecret,{},async (err, userData) =>{
+//     if (err) throw err;
+//     resolve(userData)
+//   })
+
+//   })
+ 
+
+// }
+
+// app.post("/api/bookings", async (req, res) => {
+//   try {
+//     const userData = await getUserDataFromReq(req);
+//     if (!userData) return res.status(401).json({ error: "Unauthorized" });
+
+//     const {
+//       place,
+//       checkInDate,
+//       checkOutDate,
+//       numberOfGuests,
+//       fullName,
+//       phone,
+//       price,
+//     } = req.body;
+
+//     const booking = await Booking.create({
+//       place,
+//       checkInDate,
+//       checkOutDate,
+//       numberOfGuests,
+//       fullName,
+//       phone,
+//       price,
+//       user: userData.id,
+//     });
+
+//     res.json(booking);
+//   } catch (err) {
+//     console.error("Booking failed:", err);
+//     res.status(422).json({ error: err.message });
+//   }
+// });
+
+
+//  app.get('/api/bookings', async (req,res) => {
+//   mongoose.connect(process.env.MONGO_URL);
+//  const userData = await getUserDataFromToken(req);
+//  res.json( await Booking.find({user:userData.id}).populate('place') );
+// });
+
+// app.get('/bookings', async (req, res) => {
+//   try {
+//     const userData = await getUserDataFromReq(req); // or getUserDataFromToken
+//     if (!userData) {
+//       return res.status(401).json({ error: "Unauthorized" });
+//     }
+
+//     const bookings = await Booking.find({
+//       user: userData.id || userData._id, // support both
+//     }).populate('place');
+
+//     res.json(bookings);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(401).json({ error: "Unauthorized" });
+//   }
+// });
+
+// Create a booking
+app.post("/api/bookings", async (req, res) => {
+  try {
+    const userData = await getUserDataFromReq(req);
+    if (!userData) return res.status(401).json({ error: "Unauthorized" });
+
+    const {
+      place,
+      checkInDate,
+      checkOutDate,
+      numberOfGuests,
+      fullName,
+      phone,
+      price,
+    } = req.body;
+
+    const booking = await Booking.create({
+      place,
+      checkInDate,
+      checkOutDate,
+      numberOfGuests,
+      fullName,
+      phone,
+      price,
+      user: userData.id,
+    });
+
+    res.json(booking); // return saved booking
+  } catch (err) {
+    console.error("Booking failed:", err);
+    res.status(422).json({ error: err.message });
+  }
+});
+
+// Get booking by ID
+app.get("/api/bookings/:id", async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id).populate("place");
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+    res.json(booking);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get all bookings for logged-in user
+app.get("/api/bookings", async (req, res) => {
+  try {
+    const userData = await getUserDataFromReq(req);
+    if (!userData) return res.status(401).json({ error: "Unauthorized" });
+
+    const bookings = await Booking.find({ user: userData.id }).populate("place");
+    res.json(bookings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
