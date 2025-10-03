@@ -1,5 +1,5 @@
 
-// import  Place from './models/place';
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -31,7 +31,7 @@ app.use(cors({
   origin: 'http://localhost:5173',
 }));
 
-// connect to DB
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
@@ -52,7 +52,7 @@ app.post('/register', async (req, res) => {
     });
     res.json(userDoc);
   } catch (err) {
-    console.error("❌ Registration error:", err);
+    console.error(" Registration error:", err);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
@@ -94,18 +94,16 @@ app.get('/profile', (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log("🚀 Server running on http://localhost:3000"));
+app.listen(3000, () => console.log(" Server running on http://localhost:3000"));
 
 
 //----------------------logout----------------------
-// app.post('/logout', (req, res) => {
-//   res.cookie('token', '').json(true);
-// });
+
 app.post('/logout', (req, res) => {
   res.clearCookie('token', {
-    httpOnly: true,   // match how you set the cookie
-    secure: true,     // only if using https
-    sameSite: 'none', // if cross-site
+    httpOnly: true,   
+    secure: true,     
+    sameSite: 'none', 
   });
   res.json({ success: true });
 });
@@ -125,7 +123,7 @@ app.post('/upload-by-link', async (req, res) => {
       dest: dest,
     });
 
-    // Send back just the filename (safer)
+    
     res.json(newName);
   } catch (err) {
     console.error(err);
@@ -178,7 +176,7 @@ app.post("/places", async (req, res) => {
 
       res.status(201).json(place);
     } catch (err) {
-      console.error("❌ Error saving place:", err);
+      console.error(" Error saving place:", err);
       res.status(500).json({ error: "Failed to save place" });
     }
   });
@@ -195,13 +193,12 @@ app.post("/places", async (req, res) => {
 //        const places = await Place.find({ owner: decoded.id });
 //        res.json(places);
 //      } catch (err) {
-//        console.error("❌ Error fetching places:", err);
+//        console.error(" Error fetching places:", err);
 //        res.status(500).json({ error: "Failed to fetch places" });
 //      }
 //    });
 // });
 
-// GET /user-places — only for logged-in user
 app.get('/user-places', (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: "Not authenticated" });
@@ -213,7 +210,7 @@ app.get('/user-places', (req, res) => {
       const places = await Place.find({ owner: decoded.id });
       res.json(places);
     } catch (err) {
-      console.error("❌ Failed to fetch user places:", err);
+      console.error(" Failed to fetch user places:", err);
       res.status(500).json({ error: "Failed to fetch user places" });
     }
   });
@@ -254,7 +251,7 @@ app.put('/places/:id', async (req, res) => {
         return res.status(404).json({ error: "Place not found" });
       }
 
-      // only the owner can update
+      
       if (userData.id !== placeDoc.owner.toString()) {
         return res.status(403).json({ error: "Forbidden" });
       }
@@ -262,7 +259,7 @@ app.put('/places/:id', async (req, res) => {
       placeDoc.set({
         title,
         address,
-        addedPhotos,   // ✅ match frontend field
+        addedPhotos,   
         description,
         perks,
         extraInfo,
@@ -274,7 +271,7 @@ app.put('/places/:id', async (req, res) => {
 
       await placeDoc.save();
 
-      res.json(placeDoc); // send back updated place
+      res.json(placeDoc); 
     } catch (e) {
       console.error(e);
       res.status(500).json({ error: "Failed to update place" });
@@ -286,27 +283,25 @@ app.put('/places/:id', async (req, res) => {
 app.get('/places',async (req,res) => {
     res.json(await Place.find());
 });
+// ---------------------delete the place----------------------
+app.delete("/places/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedPlace = await Place.findByIdAndDelete(id);
+
+    if (!deletedPlace) {
+      return res.status(404).json({ error: "Place not found" });
+    }
+
+    res.json({ success: true, message: "Place deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ error: "Failed to delete place" });
+  }
+});
+
 //----------------------- booking-----------------------
-// app.post('/bookings', async (req, res) => {
-//   try {
-//     const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
 
-//     const booking = await Booking.create({
-//       place,
-//       checkInDate: checkIn,    // map to schema field
-//       checkOutDate: checkOut,  // map to schema field
-//       numberOfGuests,
-//       fullName: name,          // map to schema field
-//       phone,
-//       price,
-//     });
-
-//     res.json(booking);
-//   } catch (err) {
-//     console.error("Booking error:", err);
-//     res.status(500).json({ error: "Failed to create booking" });
-//   }
-// });
 
 function getUserDataFromReq(req) {
   return new Promise((resolve, reject) => {
@@ -326,85 +321,7 @@ function getUserDataFromReq(req) {
 
 
 
-
-
-// app.get('/api/bookings', async (req,res) => {
-//   mongoose.connect(process.env.MONGO_URL);
-//   const userData = await getUserDataFromReq(req);
-//   res.json( await Booking.find({user:userData.id}).populate('place') );
-// });
-
-// function getUserDataFromReq(req){
-//   return new Promise ((resolve,reject) =>{
-//      jwt.verify(req.cookies,jwtSecret,{},async (err, userData) =>{
-//     if (err) throw err;
-//     resolve(userData)
-//   })
-
-//   })
- 
-
-// }
-
-// app.post("/api/bookings", async (req, res) => {
-//   try {
-//     const userData = await getUserDataFromReq(req);
-//     if (!userData) return res.status(401).json({ error: "Unauthorized" });
-
-//     const {
-//       place,
-//       checkInDate,
-//       checkOutDate,
-//       numberOfGuests,
-//       fullName,
-//       phone,
-//       price,
-//     } = req.body;
-
-//     const booking = await Booking.create({
-//       place,
-//       checkInDate,
-//       checkOutDate,
-//       numberOfGuests,
-//       fullName,
-//       phone,
-//       price,
-//       user: userData.id,
-//     });
-
-//     res.json(booking);
-//   } catch (err) {
-//     console.error("Booking failed:", err);
-//     res.status(422).json({ error: err.message });
-//   }
-// });
-
-
-//  app.get('/api/bookings', async (req,res) => {
-//   mongoose.connect(process.env.MONGO_URL);
-//  const userData = await getUserDataFromToken(req);
-//  res.json( await Booking.find({user:userData.id}).populate('place') );
-// });
-
-// app.get('/bookings', async (req, res) => {
-//   try {
-//     const userData = await getUserDataFromReq(req); // or getUserDataFromToken
-//     if (!userData) {
-//       return res.status(401).json({ error: "Unauthorized" });
-//     }
-
-//     const bookings = await Booking.find({
-//       user: userData.id || userData._id, // support both
-//     }).populate('place');
-
-//     res.json(bookings);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(401).json({ error: "Unauthorized" });
-//   }
-// });
-
-// Create a booking
+//------------------- Create a booking---------------------
 app.post("/api/bookings", async (req, res) => {
   try {
     const userData = await getUserDataFromReq(req);
@@ -431,14 +348,14 @@ app.post("/api/bookings", async (req, res) => {
       user: userData.id,
     });
 
-    res.json(booking); // return saved booking
+    res.json(booking); 
   } catch (err) {
     console.error("Booking failed:", err);
     res.status(422).json({ error: err.message });
   }
 });
 
-// Get booking by ID
+// -------------------------Get booking by ID-----------------------------
 app.get("/api/bookings/:id", async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id).populate("place");
@@ -465,7 +382,7 @@ app.get("/api/bookings", async (req, res) => {
 });
 
 
-// Example: Express backend
+// -------------------------delete a booking----------------------------
 app.delete("/api/bookings/:id", async (req, res) => {
   const { id } = req.params;
   try {
