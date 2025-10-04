@@ -1,7 +1,7 @@
 import { useState ,useEffect} from "react";
 import Perks from "../Perks.jsx";
 import PhotoUploader from "../PhotoUploader.jsx";
-import axios from "axios";
+import axios from "../axios";
 import AccountNav from "../AccountNav.jsx";
 import { Navigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -74,19 +74,19 @@ export default function PlacesFormPage() {
 
   try {
     if (id) {
-      // Update existing place (PUT replaces the old data)
+      
       await axios.put(`http://localhost:3000/places/${id}`, placeData);
-      alert("✅ Place updated successfully!");
+      alert(" Place updated successfully!");
     } else {
-      // Create new place
+      
       await axios.post("http://localhost:3000/places", placeData);
-      alert("✅ Place saved successfully!");
+      alert(" Place saved successfully!");
     }
 
     setRedirect(true);
   } catch (error) {
     console.error(error);
-    alert("❌ Failed to save place. Please try again.");
+    alert(" Failed to save place. Please try again.");
   }
 }
 

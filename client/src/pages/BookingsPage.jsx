@@ -1,85 +1,4 @@
 
-
-
-// import { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
-// import axios from "axios";
-// import AccountNav from "../AccountNav"; // Make sure path is correct
-
-// export default function BookingsPage() {
-//   const [bookings, setBookings] = useState([]);
-
-//   useEffect(() => {
-//     axios.get("/api/bookings").then((res) => {
-//       setBookings(res.data);
-//     }).catch((err) => {
-//       console.error("Failed to load bookings:", err);
-//     });
-//   }, []);
-
-//   return (
-//     <div>
-//       <AccountNav />
-
-//       <div className="max-w-4xl mx-auto">
-//         <h1 className="text-2xl font-semibold mb-6">My Bookings</h1>
-
-//         {bookings.length === 0 && (
-//           <p className="text-gray-500">You have no bookings yet.</p>
-//         )}
-
-//         <div className="grid gap-6">
-//           {bookings.map((booking) => (
-//             <Link
-//               key={booking._id}
-//               to={`/account/bookings/${booking._id}`}
-//               className="block border rounded-2xl overflow-hidden shadow hover:shadow-lg transition"
-//             >
-//               <div className="flex gap-4">
-//                 {booking.place.photos?.[0] && (
-//                   <img
-//                     src={booking.place.photos[0]}
-//                     alt={booking.place.title}
-//                     className="w-48 h-32 object-cover"
-//                   />
-//                 )}
-//                 <div className="p-4 flex-1">
-//                   <h2 className="text-xl font-semibold mb-2">{booking.place.title}</h2>
-
-//                   <div className="flex gap-4 text-gray-600 mb-2">
-//                     <div>
-//                       <span className="font-semibold">Check-in:</span>{" "}
-//                       {new Date(booking.checkInDate).toLocaleDateString()}
-//                     </div>
-//                     <div>
-//                       <span className="font-semibold">Check-out:</span>{" "}
-//                       {new Date(booking.checkOutDate).toLocaleDateString()}
-//                     </div>
-//                   </div>
-
-//                   <div className="flex gap-4 text-gray-600 mb-2">
-//                     <div>
-//                       <span className="font-semibold">Guests:</span> {booking.numberOfGuests}
-//                     </div>
-//                     <div>
-//                       <span className="font-semibold">Total Price:</span> R{booking.price}
-//                     </div>
-//                   </div>
-
-//                   <div className="text-gray-500 text-sm">
-//                     Booking for: {booking.fullName}, Phone: {booking.phone}
-//                   </div>
-//                 </div>
-//               </div>
-//             </Link>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 // import { useEffect, useState } from "react";
 // import { Link } from "react-router-dom";
 // import axios from "axios";
@@ -182,7 +101,7 @@
 //   );
 // }
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../axios";
 import AccountNav from "../AccountNav";
 
 export default function BookingsPage() {
@@ -226,7 +145,7 @@ export default function BookingsPage() {
               className="border border-gray-300 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1"
             >
               <div className="flex flex-col md:flex-row gap-4">
-                {/* Place photo */}
+                
                 {booking.place.photos?.[0] && (
                   <img
                     src={booking.place.photos[0]}
@@ -235,20 +154,20 @@ export default function BookingsPage() {
                   />
                 )}
 
-                {/* Booking details */}
+                
                 <div className="p-4 flex-1 bg-white flex flex-col justify-between">
                   <div>
-                    {/* Booking ID */}
+                  
                     <p className="text-gray-800 font-semibold mb-1">
                       Booking ID: {booking._id}
                     </p>
 
-                    {/* Place title */}
+                    
                     <h2 className="text-2xl font-semibold mb-2 text-gray-800">
                       {booking.place.title}
                     </h2>
 
-                    {/* Booking info */}
+                  
                     <div className="flex flex-wrap gap-4 text-gray-800 mb-2">
                       <div>
                         <span className="font-semibold">Check-in:</span>{" "}
@@ -275,7 +194,7 @@ export default function BookingsPage() {
                     </div>
                   </div>
 
-                  {/* Delete button aligned right */}
+                  
                   <div className="flex justify-end">
                     <button
                       onClick={() => handleDelete(booking._id)}
