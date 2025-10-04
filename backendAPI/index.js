@@ -34,7 +34,7 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 // }));
 const allowedOrigins = [
   "http://localhost:5173",                   
-  "https://precious-tapioca-1bd95f.netlify.app",    
+  "https://mern-5-7jiw.onrender.com",    
 ];
 
 app.use(cors({
