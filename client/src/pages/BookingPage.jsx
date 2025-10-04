@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../axios";
+import axios from "axios";
 
 export default function BookingPage() {
   const { id } = useParams();

@@ -358,7 +358,7 @@
 // }
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "../axios";
+import axios from "axios";
 import AccountNav from "../AccountNav";
 
 export default function PlacesPage() {

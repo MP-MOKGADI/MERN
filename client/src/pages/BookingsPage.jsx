@@ -101,7 +101,7 @@
 //   );
 // }
 import { useEffect, useState } from "react";
-import axios from "../axios";
+import axios from "axios";
 import AccountNav from "../AccountNav";
 
 export default function BookingsPage() {
