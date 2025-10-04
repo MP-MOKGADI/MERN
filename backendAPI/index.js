@@ -52,79 +52,23 @@ app.get('/test', (req, res) => {
 });
 
 // ---------------- REGISTER ----------------
-// app.post('/register', async (req, res) => {
-//   const { name, email, password } = req.body;
-
-//   try {
-//     const userDoc = await User.create({ 
-//       name,
-//       email,
-//       password: bcrypt.hashSync(password, bcryptSalt),
-//     });
-//     res.json(userDoc);
-//   } catch (err) {
-//     console.error(" Registration error:", err);
-//     res.status(500).json({ error: 'Registration failed' });
-//   }
-// });
 app.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    
     const userDoc = await User.create({ 
       name,
       email,
       password: bcrypt.hashSync(password, bcryptSalt),
     });
-
-    
-    jwt.sign(
-      { id: userDoc._id },
-      jwtSecret,
-      {},
-      (err, token) => {
-        if (err) throw err;
-
-        
-        res.cookie('token', token, {
-          httpOnly: true,
-          secure: true,      
-          sameSite: 'none',  
-        }).json(userDoc);
-      }
-    );
+    res.json(userDoc);
   } catch (err) {
-    console.error("Registration error:", err);
+    console.error(" Registration error:", err);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
 
-
 // ---------------- LOGIN ----------------
-// app.post('/login', async (req, res) => {
-//   const { email, password } = req.body;
-//   const userDoc = await User.findOne({ email });
-
-//   if (userDoc) {
-//     const passOk = bcrypt.compareSync(password, userDoc.password);
-//     if (passOk) {
-//       jwt.sign(
-//         { id: userDoc._id },   // keep token light
-//         jwtSecret,
-//         {},
-//         (err, token) => {
-//           if (err) throw err;
-//           res.cookie('token', token, { httpOnly: true }).json(userDoc);
-//         }
-//       );
-//     } else {
-//       res.status(400).json('wrong password');
-//     }
-//   } else {
-//     res.status(404).json('user not found');
-//   }
-// });
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const userDoc = await User.findOne({ email });
@@ -133,17 +77,12 @@ app.post('/login', async (req, res) => {
     const passOk = bcrypt.compareSync(password, userDoc.password);
     if (passOk) {
       jwt.sign(
-        { id: userDoc._id },   
+        { id: userDoc._id },   // keep token light
         jwtSecret,
         {},
         (err, token) => {
           if (err) throw err;
-          
-          res.cookie('token', token, { 
-            httpOnly: true,     
-            secure: true,       
-            sameSite: 'none',   
-          }).json(userDoc);
+          res.cookie('token', token, { httpOnly: true }).json(userDoc);
         }
       );
     } else {
@@ -155,49 +94,27 @@ app.post('/login', async (req, res) => {
 });
 
 // ---------------- PROFILE ----------------
-// app.get('/profile', (req, res) => {
-//   const { token } = req.cookies;
-//   if (!token) return res.json(null);
-
-//   jwt.verify(token, jwtSecret, {}, async (err, decoded) => {
-//     if (err) return res.status(401).json(null);
-//     const userDoc = await User.findById(decoded.id);
-//     res.json(userDoc);
-//   });
-// });
-app.get('/profile', async (req, res) => {
+app.get('/profile', (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.json(null);
 
-  try {
-    const decoded = jwt.verify(token, jwtSecret);
+  jwt.verify(token, jwtSecret, {}, async (err, decoded) => {
+    if (err) return res.status(401).json(null);
     const userDoc = await User.findById(decoded.id);
     res.json(userDoc);
-  } catch (err) {
-    console.error("Profile error:", err);
-    res.status(401).json(null);
-  }
+  });
 });
 
-
+app.listen(3000, () => console.log(" Server running on http://localhost:3000"));
 
 
 //----------------------logout----------------------
 
-// app.post('/logout', (req, res) => {
-//   res.clearCookie('token', {
-//     httpOnly: true,   
-//     secure: true,     
-//     sameSite: 'none', 
-//   });
-//   res.json({ success: true });
-// });
 app.post('/logout', (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    secure: true,      
-    sameSite: 'none',  
-    maxAge: 0,         
+  res.clearCookie('token', {
+    httpOnly: true,   
+    secure: true,     
+    sameSite: 'none', 
   });
   res.json({ success: true });
 });
