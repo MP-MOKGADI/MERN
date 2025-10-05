@@ -34,13 +34,22 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 // }));
 const allowedOrigins = [
   "http://localhost:5173",                   
-  "https://mern-5-7jiw.onrender.com",    
+    
 ];
 
 app.use(cors({
   origin: allowedOrigins,
   credentials: true, 
 }));
+
+
+
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+
+// app.listen(3000, () => console.log(" Server running on http://localhost:3000"));
+
+
 
 
 mongoose.connect(process.env.MONGO_URI)
@@ -105,7 +114,7 @@ app.get('/profile', (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log(" Server running on http://localhost:3000"));
+
 
 
 //----------------------logout----------------------
@@ -404,3 +413,12 @@ app.delete("/api/bookings/:id", async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+app.use(express.static(path.join(__dirname, "client", "dist")));
+
+app.get("(.*)", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));

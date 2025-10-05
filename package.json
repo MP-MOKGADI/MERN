@@ -1,0 +1,8 @@
+{
+  "name": "MERC2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/MP-MOKGADI/MERN.git",
+  "author": "Masela Mokgadi <mokgadipretty1233@gmail.com>",
+  "license": "MIT"
+}
